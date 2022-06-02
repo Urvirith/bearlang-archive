@@ -31,13 +31,21 @@ func (lex *Lexer) NextToken() token.Token {
 	case '-':
 		tok = newToken(token.SUB, lex.ch)
 	case '*':
-		tok = newToken(token.MUL, lex.ch)
+		tok = newToken(token.ASTERISK, lex.ch)
 	case '/':
 		tok = newToken(token.DIV, lex.ch)
+	case '%':
+		tok = newToken(token.MOD, lex.ch)
 	case '|':
 		tok = newToken(token.OR, lex.ch)
 	case '&':
 		tok = newToken(token.AND, lex.ch)
+	case '!':
+		tok = newToken(token.BANG, lex.ch)
+	case '~':
+		tok = newToken(token.NOT, lex.ch)
+	case '^':
+		tok = newToken(token.XOR, lex.ch)
 	case '(':
 		tok = newToken(token.LPAREN, lex.ch)
 	case ')':
@@ -87,6 +95,16 @@ func (lex *Lexer) readChar() {
 	}
 	lex.pos = lex.readPos
 	lex.readPos += 1
+}
+
+// Read the character of the input string without moving forward
+func (lex *Lexer) peekChar() byte {
+	// Read the Character or prevent overflow of read from the readPos
+	if lex.readPos < len(lex.in) {
+		return lex.in[lex.readPos]
+	} else {
+		return 0
+	}
 }
 
 // Read the identifier of the input string

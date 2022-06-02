@@ -7,7 +7,7 @@ import (
 )
 
 func TestTokens(t *testing.T) {
-	input := `=+-*/|&(){}[],:;`
+	input := `= + - * / % | & ! ~ ^ ( ) { } [ ] , : ; fn let vol struct enum union const return if elif else match default true false`
 
 	tests := []struct {
 		expectType    token.TokenType
@@ -16,10 +16,14 @@ func TestTokens(t *testing.T) {
 		{token.ASSIGN, "="},
 		{token.ADD, "+"},
 		{token.SUB, "-"},
-		{token.MUL, "*"},
+		{token.ASTERISK, "*"},
 		{token.DIV, "/"},
+		{token.MOD, "%"},
 		{token.OR, "|"},
 		{token.AND, "&"},
+		{token.BANG, "!"},
+		{token.NOT, "~"},
+		{token.XOR, "^"},
 		{token.LPAREN, "("},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
@@ -29,6 +33,21 @@ func TestTokens(t *testing.T) {
 		{token.COMMA, ","},
 		{token.COLON, ":"},
 		{token.SCOLON, ";"},
+		{token.FUNCTION, "fn"},
+		{token.LET, "let"},
+		{token.VOLITILE, "vol"},
+		{token.STRUCT, "struct"},
+		{token.ENUM, "enum"},
+		{token.UNION, "union"},
+		{token.CONST, "const"},
+		{token.RETURN, "return"},
+		{token.IF, "if"},
+		{token.ELIF, "elif"},
+		{token.ELSE, "else"},
+		{token.MATCH, "match"},
+		{token.DEFAULT, "default"},
+		{token.TRUE, "true"},
+		{token.FALSE, "false"},
 		{token.EOF, ""},
 	}
 
@@ -75,7 +94,7 @@ func TestCode(t *testing.T) {
 		{token.LET, "let"},
 		{token.ID, "add"},
 		{token.ASSIGN, "="},
-		{token.FN, "fn"},
+		{token.FUNCTION, "fn"},
 		{token.LPAREN, "("},
 		{token.ID, "x"},
 		{token.COMMA, ","},
