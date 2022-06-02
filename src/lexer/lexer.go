@@ -2,6 +2,7 @@ package lexer
 
 import "github.com/Urvirith/bearlang/src/token"
 
+// Structure defining the Lexer
 type Lexer struct {
 	in      string // Input data
 	pos     int    // Current position in data - Current Character
@@ -23,20 +24,36 @@ func (lex *Lexer) NextToken() token.Token {
 	switch lex.ch {
 	case '=':
 		tok = newToken(token.ASSIGN, lex.ch)
-	case ';':
-		tok = newToken(token.SCOLON, lex.ch)
+	case '+':
+		tok = newToken(token.ADD, lex.ch)
+	case '-':
+		tok = newToken(token.SUB, lex.ch)
+	case '*':
+		tok = newToken(token.MUL, lex.ch)
+	case '/':
+		tok = newToken(token.DIV, lex.ch)
+	case '|':
+		tok = newToken(token.OR, lex.ch)
+	case '&':
+		tok = newToken(token.AND, lex.ch)
 	case '(':
 		tok = newToken(token.LPAREN, lex.ch)
 	case ')':
 		tok = newToken(token.RPAREN, lex.ch)
-	case ',':
-		tok = newToken(token.COMMA, lex.ch)
-	case '+':
-		tok = newToken(token.ADD, lex.ch)
 	case '{':
 		tok = newToken(token.LBRACE, lex.ch)
 	case '}':
 		tok = newToken(token.RBRACE, lex.ch)
+	case '[':
+		tok = newToken(token.LBRACK, lex.ch)
+	case ']':
+		tok = newToken(token.RBRACK, lex.ch)
+	case ',':
+		tok = newToken(token.COMMA, lex.ch)
+	case ':':
+		tok = newToken(token.COLON, lex.ch)
+	case ';':
+		tok = newToken(token.SCOLON, lex.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -58,6 +75,7 @@ func (lex *Lexer) readChar() {
 	lex.readPos += 1
 }
 
+// Return a new token
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }

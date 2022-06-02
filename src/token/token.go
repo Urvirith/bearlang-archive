@@ -31,27 +31,29 @@ const (
 	SUB    = "-"
 	MUL    = "*"
 	DIV    = "/"
+	OR     = "|"
+	AND    = "&"
 
 	// Comparators
-	EQU = "=="
-	NEQ = "!="
-	GRT = ">"
-	LES = "<"
-	GEQ = ">="
-	LEQ = "<="
-	OR  = "||"
-	AND = "&&"
+	EQU  = "=="
+	NEQ  = "!="
+	GRT  = ">"
+	LES  = "<"
+	GEQ  = ">="
+	LEQ  = "<="
+	COR  = "||"
+	CAND = "&&"
 
 	// Delimiters
-	COMMA  = ","
-	COLON  = ":"
-	SCOLON = ";"
 	LPAREN = "("
 	RPAREN = ")"
 	LBRACE = "{"
 	RBRACE = "}"
 	LBRACK = "["
 	RBRACK = "]"
+	COMMA  = ","
+	COLON  = ":"
+	SCOLON = ";"
 
 	// Keywords
 	FN  = "FN"  // Function
