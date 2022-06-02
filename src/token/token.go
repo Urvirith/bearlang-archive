@@ -7,6 +7,12 @@ type Token struct {
 	Literal string
 }
 
+var keywords = map[string]TokenType{
+	"fn":     FN,
+	"let":    LET,
+	"return": RETURN,
+}
+
 // Constants For The Types Of Tokens
 const (
 	ILLEGAL = "ILLEGAL"
@@ -56,7 +62,19 @@ const (
 	SCOLON = ";"
 
 	// Keywords
-	FN  = "FN"  // Function
-	LET = "LET" // Let (Variable Assign)
-	VOL = "VOL" // Volitile
+	FN     = "FN"     // Function
+	LET    = "LET"    // Let (Variable Declare)
+	VOL    = "VOL"    // Volitile
+	STRUCT = "STRUCT" // Structure
+	ENUM   = "ENUM"   // Enumeration
+	UNION  = "UNION"  // Union
+	CONST  = "CONST"  // Constant
+	RETURN = "RETURN" // Return
 )
+
+func LookupID(id string) TokenType {
+	if tok, ok := keywords[id]; ok {
+		return tok
+	}
+	return ID
+}
