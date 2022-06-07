@@ -25,11 +25,39 @@ func (lex *Lexer) NextToken() token.Token {
 
 	switch lex.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, lex.ch)
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.EQU, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.ASSIGN, lex.ch)
+		}
 	case '+':
 		tok = newToken(token.ADD, lex.ch)
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.ADD_ASSIGN, string(ch)+string(lex.ch))
+		} else if lex.peekChar() == '+' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.INC, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.ADD, lex.ch)
+		}
 	case '-':
 		tok = newToken(token.SUB, lex.ch)
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.SUB_ASSIGN, string(ch)+string(lex.ch))
+		} else if lex.peekChar() == '-' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.DEC, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.SUB, lex.ch)
+		}
 	case '*':
 		tok = newToken(token.ASTERISK, lex.ch)
 	case '/':
@@ -37,15 +65,56 @@ func (lex *Lexer) NextToken() token.Token {
 	case '%':
 		tok = newToken(token.MOD, lex.ch)
 	case '|':
-		tok = newToken(token.OR, lex.ch)
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.OR_ASSIGN, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.OR, lex.ch)
+		}
 	case '&':
 		tok = newToken(token.AND, lex.ch)
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.AND_ASSIGN, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.AND, lex.ch)
+		}
 	case '!':
-		tok = newToken(token.BANG, lex.ch)
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.NEQ, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.NOT, lex.ch)
+		}
+	case '<':
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.LEQ, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.LES, lex.ch)
+		}
+	case '>':
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.GEQ, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.GRT, lex.ch)
+		}
 	case '~':
-		tok = newToken(token.NOT, lex.ch)
+		tok = newToken(token.COMP, lex.ch)
 	case '^':
-		tok = newToken(token.XOR, lex.ch)
+		if lex.peekChar() == '=' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.XORASN, string(ch)+string(lex.ch))
+		} else {
+			tok = newToken(token.XOR, lex.ch)
+		}
 	case '(':
 		tok = newToken(token.LPAREN, lex.ch)
 	case ')':
@@ -73,7 +142,7 @@ func (lex *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupID(tok.Literal)
 			return tok
 		} else if isDigit(lex.ch) {
-			tok.Type = token.I32
+			tok.Type = token.INT
 			tok.Literal = lex.readNumber()
 			return tok
 		} else {
@@ -139,10 +208,17 @@ func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
+// Return a new token from two or more characters
+func newCompoundToken(tokenType token.TokenType, str string) token.Token {
+	return token.Token{Type: tokenType, Literal: str}
+}
+
+// Verify is letter
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
 
+// Verify is number
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }

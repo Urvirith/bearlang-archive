@@ -32,6 +32,7 @@ const (
 
 	// Identifiers & Literals
 	ID   = "ID"   // add, x, y, etc...
+	INT  = "INT"  // Place Holder For Any Integer Signed or Unsigned Until Resolved By Declare
 	I8   = "I8"   // Signed Integer 8 Bit
 	I16  = "I16"  // Signed Integer 16 Bit
 	I32  = "I32"  // Signed Integer 32 Bit
@@ -46,23 +47,29 @@ const (
 	F64  = "F64"  // Float 64 Bit
 
 	// Operators
-	ASSIGN   = "="
-	ADD      = "+"
-	SUB      = "-"
-	ASTERISK = "*"
-	DIV      = "/"
-	MOD      = "%"
-	INC      = "++"
-	DEC      = "--"
+	ASSIGN     = "="
+	ADD        = "+"
+	SUB        = "-"
+	ASTERISK   = "*"
+	DIV        = "/"
+	MOD        = "%"
+	INC        = "++"
+	DEC        = "--"
+	ADD_ASSIGN = "+="
+	SUB_ASSIGN = "-="
 
 	// Bitwise Operators
-	OR     = "|"
-	AND    = "&"
-	BANG   = "!"
-	NOT    = "~"
-	XOR    = "^"
-	LSHIFT = "<<"
-	RSHIFT = ">>"
+	OR         = "|"
+	OR_ASSIGN  = "|="
+	AND        = "&"
+	AND_ASSIGN = "&="
+	NOT        = "!"
+	NOT_ASSIGN = "!="
+	COMP       = "~"
+	XOR        = "^"
+	XORASN     = "^="
+	LSHIFT     = "<<"
+	RSHIFT     = ">>"
 
 	// Comparators
 	EQU  = "=="

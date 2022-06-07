@@ -1,7 +1,7 @@
 # bearlang
 Simple Language For Embedded Development, name is based off nickname for my kid
 
-Will start off as a transpiler to C.
+Will start off as interprator in Go, possible migration to Rust for speed.
 
 Hopefully will take off and evolve, 
 
