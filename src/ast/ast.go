@@ -28,12 +28,12 @@ type Expression interface {
 }
 
 type Program struct {
-	Statement []Statement
+	Statements []Statement
 }
 
 func (prog *Program) TokenLiteral() string {
-	if len(prog.Statement) > 0 {
-		return prog.Statement[0].TokenLiteral()
+	if len(prog.Statements) > 0 {
+		return prog.Statements[0].TokenLiteral()
 	} else {
 		return ""
 	}
