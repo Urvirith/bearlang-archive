@@ -16,11 +16,15 @@ var keywords = map[string]TokenType{
 	"union":   UNION,
 	"const":   CONST,
 	"return":  RETURN,
+	"import":  IMPORT,
 	"if":      IF,
 	"elif":    ELIF,
 	"else":    ELSE,
 	"match":   MATCH,
 	"default": DEFAULT,
+	"for":     FOR,
+	"loop":    LOOP,
+	"while":   WHILE,
 	"true":    TRUE,
 	"false":   FALSE,
 	"i8":      I8,
@@ -41,10 +45,13 @@ var keywords = map[string]TokenType{
 const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
+	COMMENT = "COMMENT"
 
 	// Identifiers & Literals
-	ID   = "ID"   // add, x, y, etc...
-	NUM  = "NUM"  // Place Holder For Any Number
+	ID  = "ID"  // add, x, y, etc...
+	NUM = "NUM" // Place Holder For Any Number
+
+	// Number Declarations
 	I8   = "I8"   // Signed Integer 8 Bit
 	I16  = "I16"  // Signed Integer 16 Bit
 	I32  = "I32"  // Signed Integer 32 Bit
@@ -79,8 +86,8 @@ const (
 	XOR_ASSIGN = "^="
 	NOT        = "!"
 	COMP       = "~"
-	LSHIFT     = "<<"
-	RSHIFT     = ">>"
+	LSHF       = "<<"
+	RSHF       = ">>"
 
 	// Comparators
 	EQU  = "=="
@@ -104,6 +111,7 @@ const (
 	SCOLON = ";"
 
 	// Keywords
+	IMPORT   = "IMPORT"   // Import
 	FUNCTION = "FUNCTION" // Function
 	LET      = "LET"      // Let (Variable Declare)
 	VOLITILE = "VOLITILE" // Volitile
@@ -120,6 +128,9 @@ const (
 	MATCH        = "MATCH"
 	MATCH_BRANCH = "=>"
 	DEFAULT      = "DEFAULT"
+	FOR          = "FOR"
+	LOOP         = "LOOP"
+	WHILE        = "WHILE"
 
 	// BINARY
 	TRUE  = "TRUE"

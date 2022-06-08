@@ -109,7 +109,7 @@ func (lex *Lexer) NextToken() token.Token {
 		} else if lex.peekChar() == '<' {
 			ch := lex.ch
 			lex.readChar()
-			tok = newCompoundToken(token.LSHIFT, string(ch)+string(lex.ch))
+			tok = newCompoundToken(token.LSHF, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.LES, lex.ch)
 		}
@@ -121,7 +121,7 @@ func (lex *Lexer) NextToken() token.Token {
 		} else if lex.peekChar() == '>' {
 			ch := lex.ch
 			lex.readChar()
-			tok = newCompoundToken(token.RSHIFT, string(ch)+string(lex.ch))
+			tok = newCompoundToken(token.RSHF, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.GRT, lex.ch)
 		}

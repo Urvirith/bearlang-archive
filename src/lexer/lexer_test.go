@@ -7,7 +7,7 @@ import (
 )
 
 func TestTokens(t *testing.T) {
-	input := `= + - * / % | & ! ~ ^ += -= ++ -- |= &= ^= << >> == != > < >= <= || && => ( ) { } [ ] , : ; fn let vol struct enum union const return if elif else match default true false i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64`
+	input := `= + - * / % | & ! ~ ^ += -= ++ -- |= &= ^= << >> == != > < >= <= || && => ( ) { } [ ] , : ; import fn let vol struct enum union const return if elif else match default for loop while true false i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64`
 
 	tests := []struct {
 		expectType    token.TokenType
@@ -31,8 +31,8 @@ func TestTokens(t *testing.T) {
 		{token.OR_ASSIGN, "|="},
 		{token.AND_ASSIGN, "&="},
 		{token.XOR_ASSIGN, "^="},
-		{token.LSHIFT, "<<"},
-		{token.RSHIFT, ">>"},
+		{token.LSHF, "<<"},
+		{token.RSHF, ">>"},
 		{token.EQU, "=="},
 		{token.NEQ, "!="},
 		{token.GRT, ">"},
@@ -51,6 +51,7 @@ func TestTokens(t *testing.T) {
 		{token.COMMA, ","},
 		{token.COLON, ":"},
 		{token.SCOLON, ";"},
+		{token.IMPORT, "import"},
 		{token.FUNCTION, "fn"},
 		{token.LET, "let"},
 		{token.VOLITILE, "vol"},
@@ -64,6 +65,9 @@ func TestTokens(t *testing.T) {
 		{token.ELSE, "else"},
 		{token.MATCH, "match"},
 		{token.DEFAULT, "default"},
+		{token.FOR, "for"},
+		{token.LOOP, "loop"},
+		{token.WHILE, "while"},
 		{token.TRUE, "true"},
 		{token.FALSE, "false"},
 		{token.I8, "i8"},
