@@ -23,6 +23,18 @@ var keywords = map[string]TokenType{
 	"default": DEFAULT,
 	"true":    TRUE,
 	"false":   FALSE,
+	"i8":      I8,
+	"i16":     I16,
+	"i32":     I32,
+	"i64":     I64,
+	"i128":    I128,
+	"u8":      U8,
+	"u16":     U16,
+	"u32":     U32,
+	"u64":     U64,
+	"u128":    U128,
+	"f32":     F32,
+	"f64":     F64,
 }
 
 // Constants For The Types Of Tokens
@@ -32,7 +44,7 @@ const (
 
 	// Identifiers & Literals
 	ID   = "ID"   // add, x, y, etc...
-	INT  = "INT"  // Place Holder For Any Integer Signed or Unsigned Until Resolved By Declare
+	NUM  = "NUM"  // Place Holder For Any Number
 	I8   = "I8"   // Signed Integer 8 Bit
 	I16  = "I16"  // Signed Integer 16 Bit
 	I32  = "I32"  // Signed Integer 32 Bit
@@ -63,11 +75,10 @@ const (
 	OR_ASSIGN  = "|="
 	AND        = "&"
 	AND_ASSIGN = "&="
-	NOT        = "!"
-	NOT_ASSIGN = "!="
-	COMP       = "~"
 	XOR        = "^"
-	XORASN     = "^="
+	XOR_ASSIGN = "^="
+	NOT        = "!"
+	COMP       = "~"
 	LSHIFT     = "<<"
 	RSHIFT     = ">>"
 
@@ -103,11 +114,12 @@ const (
 	RETURN   = "RETURN"   // Return
 
 	// Flow Control
-	IF      = "IF"
-	ELIF    = "ELIF"
-	ELSE    = "ELSE"
-	MATCH   = "MATCH"
-	DEFAULT = "DEFAULT"
+	IF           = "IF"
+	ELIF         = "ELIF"
+	ELSE         = "ELSE"
+	MATCH        = "MATCH"
+	MATCH_BRANCH = "=>"
+	DEFAULT      = "DEFAULT"
 
 	// BINARY
 	TRUE  = "TRUE"

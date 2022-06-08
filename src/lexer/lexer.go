@@ -29,6 +29,10 @@ func (lex *Lexer) NextToken() token.Token {
 			ch := lex.ch
 			lex.readChar()
 			tok = newCompoundToken(token.EQU, string(ch)+string(lex.ch))
+		} else if lex.peekChar() == '>' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.MATCH_BRANCH, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.ASSIGN, lex.ch)
 		}
@@ -69,6 +73,10 @@ func (lex *Lexer) NextToken() token.Token {
 			ch := lex.ch
 			lex.readChar()
 			tok = newCompoundToken(token.OR_ASSIGN, string(ch)+string(lex.ch))
+		} else if lex.peekChar() == '|' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.COR, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.OR, lex.ch)
 		}
@@ -78,6 +86,10 @@ func (lex *Lexer) NextToken() token.Token {
 			ch := lex.ch
 			lex.readChar()
 			tok = newCompoundToken(token.AND_ASSIGN, string(ch)+string(lex.ch))
+		} else if lex.peekChar() == '&' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.CAND, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.AND, lex.ch)
 		}
@@ -94,6 +106,10 @@ func (lex *Lexer) NextToken() token.Token {
 			ch := lex.ch
 			lex.readChar()
 			tok = newCompoundToken(token.LEQ, string(ch)+string(lex.ch))
+		} else if lex.peekChar() == '<' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.LSHIFT, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.LES, lex.ch)
 		}
@@ -102,6 +118,10 @@ func (lex *Lexer) NextToken() token.Token {
 			ch := lex.ch
 			lex.readChar()
 			tok = newCompoundToken(token.GEQ, string(ch)+string(lex.ch))
+		} else if lex.peekChar() == '>' {
+			ch := lex.ch
+			lex.readChar()
+			tok = newCompoundToken(token.RSHIFT, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.GRT, lex.ch)
 		}
@@ -111,7 +131,7 @@ func (lex *Lexer) NextToken() token.Token {
 		if lex.peekChar() == '=' {
 			ch := lex.ch
 			lex.readChar()
-			tok = newCompoundToken(token.XORASN, string(ch)+string(lex.ch))
+			tok = newCompoundToken(token.XOR_ASSIGN, string(ch)+string(lex.ch))
 		} else {
 			tok = newToken(token.XOR, lex.ch)
 		}
@@ -142,7 +162,7 @@ func (lex *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupID(tok.Literal)
 			return tok
 		} else if isDigit(lex.ch) {
-			tok.Type = token.INT
+			tok.Type = token.NUM
 			tok.Literal = lex.readNumber()
 			return tok
 		} else {
@@ -166,21 +186,11 @@ func (lex *Lexer) readChar() {
 	lex.readPos += 1
 }
 
-// Read the character of the input string without moving forward
-func (lex *Lexer) peekChar() byte {
-	// Read the Character or prevent overflow of read from the readPos
-	if lex.readPos < len(lex.in) {
-		return lex.in[lex.readPos]
-	} else {
-		return 0
-	}
-}
-
 // Read the identifier of the input string
 func (lex *Lexer) readID() string {
 	// Read the Identifer or prevent overflow of read from the readPos
 	pos := lex.pos
-	for isLetter(lex.ch) {
+	for isLetter(lex.ch) || isDigit(lex.ch) {
 		lex.readChar()
 	}
 	return lex.in[pos:lex.pos]
@@ -220,5 +230,15 @@ func isLetter(ch byte) bool {
 
 // Verify is number
 func isDigit(ch byte) bool {
-	return '0' <= ch && ch <= '9'
+	return '0' <= ch && ch <= '9' || ch == '.'
+}
+
+// Read the character of the input string without moving forward
+func (lex *Lexer) peekChar() byte {
+	// Read the Character or prevent overflow of read from the readPos
+	if lex.readPos < len(lex.in) {
+		return lex.in[lex.readPos]
+	} else {
+		return 0
+	}
 }

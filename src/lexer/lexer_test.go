@@ -7,7 +7,7 @@ import (
 )
 
 func TestTokens(t *testing.T) {
-	input := `= + - * / % | & ! ~ ^ += -= ++ -- ( ) { } [ ] , : ; fn let vol struct enum union const return if elif else match default true false`
+	input := `= + - * / % | & ! ~ ^ += -= ++ -- |= &= ^= << >> == != > < >= <= || && => ( ) { } [ ] , : ; fn let vol struct enum union const return if elif else match default true false i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64`
 
 	tests := []struct {
 		expectType    token.TokenType
@@ -28,6 +28,20 @@ func TestTokens(t *testing.T) {
 		{token.SUB_ASSIGN, "-="},
 		{token.INC, "++"},
 		{token.DEC, "--"},
+		{token.OR_ASSIGN, "|="},
+		{token.AND_ASSIGN, "&="},
+		{token.XOR_ASSIGN, "^="},
+		{token.LSHIFT, "<<"},
+		{token.RSHIFT, ">>"},
+		{token.EQU, "=="},
+		{token.NEQ, "!="},
+		{token.GRT, ">"},
+		{token.LES, "<"},
+		{token.GEQ, ">="},
+		{token.LEQ, "<="},
+		{token.COR, "||"},
+		{token.CAND, "&&"},
+		{token.MATCH_BRANCH, "=>"},
 		{token.LPAREN, "("},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
@@ -52,6 +66,18 @@ func TestTokens(t *testing.T) {
 		{token.DEFAULT, "default"},
 		{token.TRUE, "true"},
 		{token.FALSE, "false"},
+		{token.I8, "i8"},
+		{token.I16, "i16"},
+		{token.I32, "i32"},
+		{token.I64, "i64"},
+		{token.I128, "i128"},
+		{token.U8, "u8"},
+		{token.U16, "u16"},
+		{token.U32, "u32"},
+		{token.U64, "u64"},
+		{token.U128, "u128"},
+		{token.F32, "f32"},
+		{token.F64, "f64"},
 		{token.EOF, ""},
 	}
 
@@ -88,12 +114,12 @@ func TestCode(t *testing.T) {
 		{token.LET, "let"},
 		{token.ID, "five"},
 		{token.ASSIGN, "="},
-		{token.INT, "5"},
+		{token.NUM, "5"},
 		{token.SCOLON, ";"},
 		{token.LET, "let"},
 		{token.ID, "ten"},
 		{token.ASSIGN, "="},
-		{token.INT, "10"},
+		{token.NUM, "10"},
 		{token.SCOLON, ";"},
 		{token.LET, "let"},
 		{token.ID, "add"},
@@ -141,10 +167,10 @@ func TestCode(t *testing.T) {
 }
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5;
-			  let ten = 10;
+	input := `let five: u32 = 5;
+			  let ten: u32 = 10;
 			  
-			  let add = fn(x, y) {
+			  let add = fn(x:u32, y:u32)(u32) {
 				return x + y;
 			  };
 			  
@@ -161,6 +187,7 @@ func TestNextToken(t *testing.T) {
 
 			  10 == 10;
 			  10 != 9;
+			  let dogu864: f32 = 20.0;
 			  `
 
 	tests := []struct {
@@ -169,13 +196,17 @@ func TestNextToken(t *testing.T) {
 	}{
 		{token.LET, "let"},
 		{token.ID, "five"},
+		{token.COLON, ":"},
+		{token.U32, "u32"},
 		{token.ASSIGN, "="},
-		{token.INT, "5"},
+		{token.NUM, "5"},
 		{token.SCOLON, ";"},
 		{token.LET, "let"},
 		{token.ID, "ten"},
+		{token.COLON, ":"},
+		{token.U32, "u32"},
 		{token.ASSIGN, "="},
-		{token.INT, "10"},
+		{token.NUM, "10"},
 		{token.SCOLON, ";"},
 		{token.LET, "let"},
 		{token.ID, "add"},
@@ -183,8 +214,15 @@ func TestNextToken(t *testing.T) {
 		{token.FUNCTION, "fn"},
 		{token.LPAREN, "("},
 		{token.ID, "x"},
+		{token.COLON, ":"},
+		{token.U32, "u32"},
 		{token.COMMA, ","},
 		{token.ID, "y"},
+		{token.COLON, ":"},
+		{token.U32, "u32"},
+		{token.RPAREN, ")"},
+		{token.LPAREN, "("},
+		{token.U32, "u32"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.RETURN, "return"},
@@ -208,21 +246,21 @@ func TestNextToken(t *testing.T) {
 		{token.SUB, "-"},
 		{token.DIV, "/"},
 		{token.ASTERISK, "*"},
-		{token.INT, "5"},
+		{token.NUM, "5"},
 		{token.SCOLON, ";"},
 		{token.IF, "if"},
-		{token.INT, "5"},
+		{token.NUM, "5"},
 		{token.LEQ, "<="},
-		{token.INT, "10"},
+		{token.NUM, "10"},
 		{token.LBRACE, "{"},
 		{token.RETURN, "return"},
 		{token.TRUE, "true"},
 		{token.SCOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.ELIF, "elif"},
-		{token.INT, "10"},
+		{token.NUM, "10"},
 		{token.GRT, ">"},
-		{token.INT, "5"},
+		{token.NUM, "5"},
 		{token.LBRACE, "{"},
 		{token.RETURN, "return"},
 		{token.TRUE, "true"},
@@ -234,13 +272,20 @@ func TestNextToken(t *testing.T) {
 		{token.FALSE, "false"},
 		{token.SCOLON, ";"},
 		{token.RBRACE, "}"},
-		{token.INT, "10"},
+		{token.NUM, "10"},
 		{token.EQU, "=="},
-		{token.INT, "10"},
+		{token.NUM, "10"},
 		{token.SCOLON, ";"},
-		{token.INT, "10"},
+		{token.NUM, "10"},
 		{token.NEQ, "!="},
-		{token.INT, "9"},
+		{token.NUM, "9"},
+		{token.SCOLON, ";"},
+		{token.LET, "let"},
+		{token.ID, "dogu864"},
+		{token.COLON, ":"},
+		{token.F32, "f32"},
+		{token.ASSIGN, "="},
+		{token.NUM, "20.0"},
 		{token.SCOLON, ";"},
 		{token.EOF, ""},
 	}
