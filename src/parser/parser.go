@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/Urvirith/bearlang/src/ast"
 	"github.com/Urvirith/bearlang/src/lexer"
 	"github.com/Urvirith/bearlang/src/token"
@@ -10,19 +12,34 @@ type Parser struct {
 	lex       *lexer.Lexer
 	curToken  token.Token
 	peekToken token.Token
+	errors    []string
+}
+
+var datatypes = []token.TokenType{
+	token.I8,
+	token.I16,
+	token.I32,
+	token.I64,
+	token.I128,
+	token.U8,
+	token.U16,
+	token.U32,
+	token.U64,
+	token.U128,
+	token.F32,
+	token.F64,
+	token.BOOL,
 }
 
 func New(lex *lexer.Lexer) *Parser {
-	psr := &Parser{lex: lex}
+	psr := &Parser{
+		lex:    lex,
+		errors: []string{},
+	}
 
 	psr.nextToken()
 
 	return psr
-}
-
-func (psr *Parser) nextToken() {
-	psr.curToken = psr.peekToken
-	psr.peekToken = psr.lex.NextToken()
 }
 
 func (psr *Parser) ParseProgram() *ast.Program {
@@ -53,13 +70,23 @@ func (psr *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: psr.curToken}
 
 	// Let is not followed by Identifer (Variable)
-	if !psr.expectPeek(token.ID) {
+	if !psr.expectPeek(token.IDENTIFIER) {
 		return nil
 	}
 
 	stmt.Name = &ast.Identifier{Token: psr.curToken, Value: psr.curToken.Literal}
 
-	// Identifer is not followed by an Assign
+	// Identifer Is Not Followed By :
+	if !psr.expectPeek(token.COLON) {
+		return nil
+	}
+
+	// Identifer Is Not Followed DataType :
+	if !psr.expectPeekDataType() {
+		return nil
+	}
+
+	// Identifer is not followed by an =
 	if !psr.expectPeek(token.ASSIGN) {
 		return nil
 	}
@@ -84,6 +111,41 @@ func (psr *Parser) expectPeek(tok token.TokenType) bool {
 	if psr.peekTokenIs(tok) {
 		psr.nextToken()
 		return true
+	} else {
+		psr.peekError(tok)
+		return false
 	}
+}
+
+// Verify all allowed types for all data
+func (psr *Parser) expectPeekDataType() bool {
+	for i := range datatypes {
+		if psr.peekTokenIs(datatypes[i]) {
+			psr.nextToken()
+			return true
+		}
+	}
+
+	psr.peekDataError()
 	return false
+}
+
+// Return errors from data structure
+func (psr *Parser) Errors() []string {
+	return psr.errors
+}
+
+func (psr *Parser) peekError(tok token.TokenType) {
+	msg := fmt.Sprintf("expected next rune to be %s, got %s instead", tok, psr.peekToken.Type)
+	psr.errors = append(psr.errors, msg)
+}
+
+func (psr *Parser) peekDataError() {
+	msg := fmt.Sprintf("expected next rune to be %v, got %s instead", datatypes, psr.peekToken.Type)
+	psr.errors = append(psr.errors, msg)
+}
+
+func (psr *Parser) nextToken() {
+	psr.curToken = psr.peekToken
+	psr.peekToken = psr.lex.NextToken()
 }

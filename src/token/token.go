@@ -39,6 +39,7 @@ var keywords = map[string]TokenType{
 	"u128":    U128,
 	"f32":     F32,
 	"f64":     F64,
+	"bool":    BOOL,
 }
 
 // Constants For The Types Of Tokens
@@ -48,8 +49,8 @@ const (
 	COMMENT = "COMMENT"
 
 	// Identifiers & Literals
-	ID  = "ID"  // add, x, y, etc...
-	NUM = "NUM" // Place Holder For Any Number
+	IDENTIFIER = "IDENTIFIER" // add, x, y, etc...
+	NUM        = "NUM"        // Place Holder For Any Number
 
 	// Number Declarations
 	I8   = "I8"   // Signed Integer 8 Bit
@@ -64,6 +65,7 @@ const (
 	U128 = "U128" // Unsigned Integer 128 Bit
 	F32  = "F32"  // Float 32 Bit
 	F64  = "F64"  // Float 64 Bit
+	BOOL = "BOOL" // Boolean Datatype
 
 	// Operators
 	ASSIGN     = "="
@@ -141,5 +143,5 @@ func LookupID(id string) TokenType {
 	if tok, ok := keywords[id]; ok {
 		return tok
 	}
-	return ID
+	return IDENTIFIER
 }
