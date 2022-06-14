@@ -11,22 +11,12 @@ type Statement interface {
 	statementNode()
 }
 
-type LetStatement struct {
-	Token token.Token
-	Name  *Identifier
-	Value Expression
-}
-
-type Identifier struct {
-	Token token.Token
-	Value string
-}
-
 type Expression interface {
 	Node
 	expressionNode()
 }
 
+// PROGRAM SECTION
 type Program struct {
 	Statements []Statement
 }
@@ -39,12 +29,39 @@ func (prg *Program) TokenLiteral() string {
 	}
 }
 
+// LET SECTION
+type LetStatement struct {
+	Token token.Token
+	Name  *Identifier
+	Value Expression
+}
+
 func (ls *LetStatement) statementNode() {
 	// Placeholder
 }
 
 func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
+}
+
+// RETURN SECTION
+type ReturnStatement struct {
+	Token token.Token
+	Value Expression
+}
+
+func (rs *ReturnStatement) statementNode() {
+	// Placeholder
+}
+
+func (rs *ReturnStatement) TokenLiteral() string {
+	return rs.Token.Literal
+}
+
+// IDENTIFIER SECTION
+type Identifier struct {
+	Token token.Token
+	Value string
 }
 
 func (ind *Identifier) expressionNode() {

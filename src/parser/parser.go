@@ -61,11 +61,14 @@ func (psr *Parser) parseStatement() ast.Statement {
 	switch psr.curToken.Type {
 	case token.LET:
 		return psr.parseLetStatement()
+	case token.RETURN:
+		return psr.parseReturnStatement()
 	default:
 		return nil
 	}
 }
 
+// Parse the let statement
 func (psr *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: psr.curToken}
 
@@ -99,14 +102,31 @@ func (psr *Parser) parseLetStatement() *ast.LetStatement {
 	return stmt
 }
 
+func (psr *Parser) parseReturnStatement() *ast.ReturnStatement {
+	stmt := &ast.ReturnStatement{Token: psr.curToken}
+
+	psr.nextToken()
+
+	// TODO : Skimming expressions until semicolon
+	for !psr.curTokenIs(token.SCOLON) {
+		psr.nextToken()
+	}
+
+	return stmt
+}
+
+// COMMON FUNCTIONS
+// Verify if the token is as expected
 func (psr *Parser) curTokenIs(tok token.TokenType) bool {
 	return psr.curToken.Type == tok
 }
 
+// Verify if the next token is as expected
 func (psr *Parser) peekTokenIs(tok token.TokenType) bool {
 	return psr.peekToken.Type == tok
 }
 
+// Verify if the next token is as expected if so move on, else return error
 func (psr *Parser) expectPeek(tok token.TokenType) bool {
 	if psr.peekTokenIs(tok) {
 		psr.nextToken()
@@ -135,16 +155,19 @@ func (psr *Parser) Errors() []string {
 	return psr.errors
 }
 
+// Add an error for the expected error
 func (psr *Parser) peekError(tok token.TokenType) {
 	msg := fmt.Sprintf("expected next rune to be %s, got %s instead", tok, psr.peekToken.Type)
 	psr.errors = append(psr.errors, msg)
 }
 
+// Add an error if the data type is not found
 func (psr *Parser) peekDataError() {
 	msg := fmt.Sprintf("expected next rune to be %v, got %s instead", datatypes, psr.peekToken.Type)
 	psr.errors = append(psr.errors, msg)
 }
 
+// Move on to the next token, and peek ahead the following token
 func (psr *Parser) nextToken() {
 	psr.curToken = psr.peekToken
 	psr.peekToken = psr.lex.NextToken()

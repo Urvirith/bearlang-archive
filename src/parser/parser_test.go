@@ -7,7 +7,7 @@ import (
 	"github.com/Urvirith/bearlang/src/lexer"
 )
 
-func TestLetStatements(t *testing.T) {
+func TestLetStatementsPass(t *testing.T) {
 	input := `
 	let x: u16 = 5;
 	let y: u32 = 10;
@@ -96,6 +96,37 @@ func testLetStatement(t *testing.T, stmt ast.Statement, name string) bool {
 	}
 
 	return true
+}
+
+func TestReturnStatementsPass(t *testing.T) {
+	input := `
+	return 5;
+	return 10;
+	return 903030;
+	`
+	lex := lexer.New(input)
+	psr := New(lex)
+	prg := psr.ParseProgram()
+	checkParserErrors(t, psr)
+
+	if prg == nil {
+		t.Fatalf("ParseProgram() returned null")
+	}
+
+	if len(prg.Statements) != 3 {
+		t.Fatalf("program.Statements does not have 3 statements. got=%d", len(prg.Statements))
+	}
+
+	for _, stmt := range prg.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt not *ast.returnStatement. got=%T", stmt)
+			continue
+		}
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral not 'return', got %q", returnStmt.TokenLiteral())
+		}
+	}
 }
 
 func checkParserErrors(t *testing.T, psr *Parser) {
