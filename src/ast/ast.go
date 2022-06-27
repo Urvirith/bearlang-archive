@@ -1,9 +1,14 @@
 package ast
 
-import "github.com/Urvirith/bearlang/src/token"
+import (
+	"bytes"
+
+	"github.com/Urvirith/bearlang/src/token"
+)
 
 type Node interface {
 	TokenLiteral() string
+	String() string
 }
 
 type Statement interface {
@@ -29,6 +34,16 @@ func (prg *Program) TokenLiteral() string {
 	}
 }
 
+func (prg *Program) String() string {
+	var out bytes.Buffer
+
+	for _, s := range prg.Statements {
+		out.WriteString(s.String())
+	}
+
+	return out.String()
+}
+
 // LET SECTION
 type LetStatement struct {
 	Token token.Token
@@ -42,6 +57,22 @@ func (ls *LetStatement) statementNode() {
 
 func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
+}
+
+func (ls *LetStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ls.TokenLiteral() + " ")
+	out.WriteString(ls.Name.String())
+	out.WriteString(" = ")
+
+	if ls.Value != nil {
+		out.WriteString(ls.Value.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
 }
 
 // RETURN SECTION
@@ -58,6 +89,20 @@ func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
 }
 
+func (rs *ReturnStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(rs.TokenLiteral() + " ")
+
+	if rs.Value != nil {
+		out.WriteString(rs.Value.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
+}
+
 // IDENTIFIER SECTION
 type Identifier struct {
 	Token token.Token
@@ -70,4 +115,30 @@ func (ind *Identifier) expressionNode() {
 
 func (ind *Identifier) TokenLiteral() string {
 	return ind.Token.Literal
+}
+
+func (ind *Identifier) String() string {
+	return ind.Value
+}
+
+// Expression Section
+type ExpressionStatment struct {
+	Token      token.Token
+	Expression Expression
+}
+
+func (es *ExpressionStatment) expressionNode() {
+	// Placeholder
+}
+
+func (es *ExpressionStatment) TokenLiteral() string {
+	return es.Token.Literal
+}
+
+func (es *ExpressionStatment) String() string {
+	if es.Expression != nil {
+		return es.Expression.String()
+	}
+
+	return ""
 }
