@@ -9,11 +9,16 @@ import (
 )
 
 type Parser struct {
-	lex       *lexer.Lexer
-	curToken  token.Token
-	peekToken token.Token
-	errors    []string
+	lex            *lexer.Lexer
+	curToken       token.Token
+	peekToken      token.Token
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns  map[token.TokenType]infixParseFn
+	errors         []string
 }
+
+type prefixParseFn func() ast.Expression
+type infixParseFn func(ast.Expression) ast.Expression
 
 var datatypes = []token.TokenType{
 	token.I8,
@@ -31,13 +36,29 @@ var datatypes = []token.TokenType{
 	token.BOOL,
 }
 
+const (
+	_ int = iota
+	LOWEST
+	EQUALS
+	LESSGREATER
+	SUM
+	PRODUCT
+	PREFIX
+	CALL
+)
+
 func New(lex *lexer.Lexer) *Parser {
 	psr := &Parser{
 		lex:    lex,
 		errors: []string{},
 	}
 
+	// Read two tokens, curToken and peekToken are set
 	psr.nextToken()
+	psr.nextToken()
+
+	psr.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+	psr.registerPrefix(token.IDENTIFIER, psr.parseIdentifier)
 
 	return psr
 }
@@ -64,7 +85,8 @@ func (psr *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return psr.parseReturnStatement()
 	default:
-		return nil
+		return psr.parseExpressionStatement()
+		//return nil
 	}
 }
 
@@ -102,6 +124,7 @@ func (psr *Parser) parseLetStatement() *ast.LetStatement {
 	return stmt
 }
 
+// Parse the return statement
 func (psr *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: psr.curToken}
 
@@ -113,6 +136,41 @@ func (psr *Parser) parseReturnStatement() *ast.ReturnStatement {
 	}
 
 	return stmt
+}
+
+// Parse Expression Statements
+func (psr *Parser) parseExpressionStatement() *ast.ExpressionStatment {
+	stmt := &ast.ExpressionStatment{
+		Token: psr.curToken,
+	}
+
+	stmt.Expression = psr.parseExpression(LOWEST)
+
+	if psr.peekTokenIs(token.SCOLON) {
+		psr.nextToken()
+	}
+
+	return stmt
+}
+
+// Parse Expression
+func (psr *Parser) parseExpression(precedence int) ast.Expression {
+	prefix := psr.prefixParseFns[psr.curToken.Type]
+
+	if prefix == nil {
+		return nil
+	}
+
+	leftExp := prefix()
+
+	return leftExp
+}
+
+func (psr *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{
+		Token: psr.curToken,
+		Value: psr.curToken.Literal,
+	}
 }
 
 // COMMON FUNCTIONS
@@ -171,4 +229,14 @@ func (psr *Parser) peekDataError() {
 func (psr *Parser) nextToken() {
 	psr.curToken = psr.peekToken
 	psr.peekToken = psr.lex.NextToken()
+}
+
+// Register a prefix for an expression
+func (psr *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
+	psr.prefixParseFns[tokenType] = fn
+}
+
+// Register a infix for an expression
+func (psr *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
+	psr.infixParseFns[tokenType] = fn
 }

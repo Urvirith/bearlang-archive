@@ -121,13 +121,13 @@ func (ind *Identifier) String() string {
 	return ind.Value
 }
 
-// Expression Section
+// EXPRESSION SECTION
 type ExpressionStatment struct {
 	Token      token.Token
 	Expression Expression
 }
 
-func (es *ExpressionStatment) expressionNode() {
+func (es *ExpressionStatment) statementNode() {
 	// Placeholder
 }
 
