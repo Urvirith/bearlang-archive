@@ -50,7 +50,7 @@ const (
 
 	// Identifiers & Literals
 	IDENTIFIER = "IDENTIFIER" // add, x, y, etc...
-	NUM        = "NUM"        // Place Holder For Any Number
+	INT        = "INT"        // Place Holder For Any Number
 
 	// Number Declarations
 	I8   = "I8"   // Signed Integer 8 Bit

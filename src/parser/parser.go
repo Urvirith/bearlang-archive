@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/Urvirith/bearlang/src/ast"
 	"github.com/Urvirith/bearlang/src/lexer"
@@ -58,7 +59,12 @@ func New(lex *lexer.Lexer) *Parser {
 	psr.nextToken()
 
 	psr.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+
+	// REGISTER PREFIXES
 	psr.registerPrefix(token.IDENTIFIER, psr.parseIdentifier)
+	psr.registerPrefix(token.INT, psr.parseIntegerLiteral)
+	psr.registerPrefix(token.SUB, psr.parsePrefixExpression)
+	psr.registerPrefix(token.NOT, psr.parsePrefixExpression)
 
 	return psr
 }
@@ -69,6 +75,7 @@ func (psr *Parser) ParseProgram() *ast.Program {
 
 	for psr.curToken.Type != token.EOF {
 		stmt := psr.parseStatement()
+		println(stmt.String())
 		if stmt != nil {
 			prg.Statements = append(prg.Statements, stmt)
 		}
@@ -158,6 +165,7 @@ func (psr *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := psr.prefixParseFns[psr.curToken.Type]
 
 	if prefix == nil {
+		psr.noPrefixParseFnError(psr.curToken.Type)
 		return nil
 	}
 
@@ -171,6 +179,42 @@ func (psr *Parser) parseIdentifier() ast.Expression {
 		Token: psr.curToken,
 		Value: psr.curToken.Literal,
 	}
+}
+
+func (psr *Parser) parseIntegerLiteral() ast.Expression {
+	literal := &ast.IntegerLiteral{
+		Token: psr.curToken,
+	}
+
+	value, err := strconv.ParseInt(psr.curToken.Literal, 0, 64)
+
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as integer", psr.curToken.Literal)
+		psr.errors = append(psr.errors, msg)
+		return nil
+	}
+
+	literal.Value = value
+
+	return literal
+}
+
+func (psr *Parser) parsePrefixExpression() ast.Expression {
+	exp := &ast.PrefixExpression{
+		Token:    psr.curToken,
+		Operator: psr.curToken.Literal,
+	}
+
+	psr.nextToken()
+
+	exp.Right = psr.parseExpression(PREFIX)
+
+	return exp
+}
+
+func (psr *Parser) noPrefixParseFnError(tokenType token.TokenType) {
+	msg := fmt.Sprintf("no prefix parse function found for %s found", tokenType)
+	psr.errors = append(psr.errors, msg)
 }
 
 // COMMON FUNCTIONS

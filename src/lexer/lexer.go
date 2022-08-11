@@ -162,7 +162,7 @@ func (lex *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupID(tok.Literal)
 			return tok
 		} else if isDigit(lex.ch) {
-			tok.Type = token.NUM
+			tok.Type = token.INT
 			tok.Literal = lex.readNumber()
 			return tok
 		} else {
