@@ -7,7 +7,7 @@ import (
 	"github.com/Urvirith/bearlang/src/repl"
 )
 
-// Test REPL
+// Test REPL Keyring
 func main() {
 	fmt.Printf("This is the REPL of BearLang\n")
 	fmt.Printf("Type in a command\n")
