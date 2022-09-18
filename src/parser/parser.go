@@ -37,6 +37,17 @@ var datatypes = []token.TokenType{
 	token.BOOL,
 }
 
+var precedences = map[token.TokenType]int{
+	token.EQU:      EQUALS,
+	token.NEQ:      EQUALS,
+	token.LES:      LESSGREATER,
+	token.GRT:      LESSGREATER,
+	token.ADD:      SUM,
+	token.SUB:      SUM,
+	token.DIV:      PRODUCT,
+	token.ASTERISK: PRODUCT,
+}
+
 const (
 	_ int = iota
 	LOWEST
@@ -59,12 +70,22 @@ func New(lex *lexer.Lexer) *Parser {
 	psr.nextToken()
 
 	psr.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+	psr.infixParseFns = make(map[token.TokenType]infixParseFn)
 
 	// REGISTER PREFIXES
 	psr.registerPrefix(token.IDENTIFIER, psr.parseIdentifier)
 	psr.registerPrefix(token.INT, psr.parseIntegerLiteral)
 	psr.registerPrefix(token.SUB, psr.parsePrefixExpression)
 	psr.registerPrefix(token.NOT, psr.parsePrefixExpression)
+
+	psr.registerInfix(token.ADD, psr.parseInfixExpression)
+	psr.registerInfix(token.SUB, psr.parseInfixExpression)
+	psr.registerInfix(token.ASTERISK, psr.parseInfixExpression)
+	psr.registerInfix(token.DIV, psr.parseInfixExpression)
+	psr.registerInfix(token.EQU, psr.parseInfixExpression)
+	psr.registerInfix(token.NEQ, psr.parseInfixExpression)
+	psr.registerInfix(token.GRT, psr.parseInfixExpression)
+	psr.registerInfix(token.LES, psr.parseInfixExpression)
 
 	return psr
 }
@@ -171,6 +192,18 @@ func (psr *Parser) parseExpression(precedence int) ast.Expression {
 
 	leftExp := prefix()
 
+	for !psr.peekTokenIs(token.SCOLON) && precedence < psr.peekPrecedence() {
+		infix := psr.infixParseFns[psr.peekToken.Type]
+
+		if infix == nil {
+			return leftExp
+		}
+
+		psr.nextToken()
+
+		leftExp = infix(leftExp)
+	}
+
 	return leftExp
 }
 
@@ -217,6 +250,21 @@ func (psr *Parser) noPrefixParseFnError(tokenType token.TokenType) {
 	psr.errors = append(psr.errors, msg)
 }
 
+// Infix Expressions
+func (psr *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
+	expr := &ast.InfixExpression{
+		Token:    psr.curToken,
+		Operator: psr.curToken.Literal,
+		Left:     left,
+	}
+
+	prec := psr.curPrecedence()
+	psr.nextToken()
+	expr.Right = psr.parseExpression(prec)
+
+	return expr
+}
+
 // COMMON FUNCTIONS
 // Verify if the token is as expected
 func (psr *Parser) curTokenIs(tok token.TokenType) bool {
@@ -250,6 +298,24 @@ func (psr *Parser) expectPeekDataType() bool {
 
 	psr.peekDataError()
 	return false
+}
+
+// Peek Precedence
+func (psr *Parser) peekPrecedence() int {
+	if p, ok := precedences[psr.peekToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
+}
+
+// Current Precedence
+func (psr *Parser) curPrecedence() int {
+	if p, ok := precedences[psr.curToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
 }
 
 // Return errors from data structure
