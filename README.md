@@ -1,4 +1,6 @@
 # bearlang
+ARCHIVE - switching to C due to simpler syntax and less complex to work with
+
 Simple Language For Embedded Development, name is based off nickname for my kid
 
 Will start off as interprator in Go, possible migration to Rust for speed.
