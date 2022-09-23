@@ -214,3 +214,21 @@ func (oe *InfixExpression) String() string {
 
 	return out.String()
 }
+
+// Boolean
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode() {
+	// Place holders
+}
+
+func (bo *Boolean) TokenLiteral() string {
+	return bo.Token.Literal
+}
+
+func (bo *Boolean) String() string {
+	return bo.Token.Literal
+}

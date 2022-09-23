@@ -77,6 +77,9 @@ func New(lex *lexer.Lexer) *Parser {
 	psr.registerPrefix(token.INT, psr.parseIntegerLiteral)
 	psr.registerPrefix(token.SUB, psr.parsePrefixExpression)
 	psr.registerPrefix(token.NOT, psr.parsePrefixExpression)
+	psr.registerPrefix(token.TRUE, psr.parseBoolean)
+	psr.registerPrefix(token.FALSE, psr.parseBoolean)
+	psr.registerPrefix(token.LPAREN, psr.parseGroupExpression)
 
 	psr.registerInfix(token.ADD, psr.parseInfixExpression)
 	psr.registerInfix(token.SUB, psr.parseInfixExpression)
@@ -263,6 +266,25 @@ func (psr *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	expr.Right = psr.parseExpression(prec)
 
 	return expr
+}
+
+func (psr *Parser) parseBoolean() ast.Expression {
+	return &ast.Boolean{
+		Token: psr.curToken,
+		Value: psr.curTokenIs(token.TRUE),
+	}
+}
+
+func (psr *Parser) parseGroupExpression() ast.Expression {
+	psr.nextToken()
+
+	exp := psr.parseExpression(LOWEST)
+
+	if !psr.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return exp
 }
 
 // COMMON FUNCTIONS
